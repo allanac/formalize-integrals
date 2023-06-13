@@ -121,6 +121,7 @@ lemma piecewise_constant_ode : ∀ N : ℕ, y F x₀ ε (N*ε) = x₀ + ∫ (s :
       rw [y, NSimp]
     _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s)) + ε • F (y F x₀ ε (k*ε)) := by
       rw [Ik]
+      sorry
     _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s)) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), (1 : ℝ)) • F (y F x₀ ε (k*ε)) := by
       rw [integral_const]
       simp
@@ -191,13 +192,26 @@ lemma pre_Claim1' : ∀ (m k : ℕ), ‖(x_N F x₀ ε (k + m)) - (x_N F x₀ ε
   -- simp
   
 
-lemma pre_Claim1'' (ε : ℝ) (e_pos : ε > 0) (t₀ t₁ : ℝ) (t0_le_t1 : t₀ ≤ t₁) : ‖x' F x₀ ε t₁ - x' F x₀ ε t₀‖ ≤ M * (t₁ - t₀) := by
+lemma pre_Claim1'' (ε : ℝ) (e_pos : ε > 0) (t₀ t₁ : ℝ) (t0_nn : 0 ≤ t₀) (t0_le_t1 : t₀ ≤ t₁) : ‖x' F x₀ ε t₁ - x' F x₀ ε t₀‖ ≤ M * (t₁ - t₀) := by
   let N₀ := N ε t₀
   let N₁ := N ε t₁
   let m := N₀ + 1
-  cases' lt_or_le t₁ (m : ℝ) with h h
+  cases' lt_or_le t₁ (m * ε) with h h
   . have N01 : N₀ = N₁ := by
-      sorry
+      have : N₁ = N ε t₁ := by rfl
+      rw [this, N]
+      symm
+      rw [Nat.floor_eq_iff]
+      constructor
+      simp [N]
+      apply le_trans (b:= t₀/ε)
+      apply Nat.floor_le
+      apply div_nonneg
+      assumption
+      linarith
+      rw [div_le_div_right]
+      assumption
+      assumption
     sorry
   sorry
 
