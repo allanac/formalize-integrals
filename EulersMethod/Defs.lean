@@ -105,6 +105,15 @@ variable (r : ℝ)
 variable (M : ℝ) (M_nn : 0 ≤ M)
 variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 
-lemma Claim1 : ∀ (ε : NNReal) (t₀ t₁ : ℝ), ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := sorry
+lemma Claim1 : ∀ (ε : NNReal) (t₀ t₁ : ℝ), ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := by
+  intro e t₀ t₁
+  calc
+    ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ = ‖ x₀ + ∫ (s : ℝ) in (0)..(t₀), F (y F x₀ ε s) ∂volume - x₀ - ∫ (s : ℝ) in (0)..(t₁), F (y F x₀ ε s) ∂volume ‖ := by sorry
+    _ = ‖∫ (s : ℝ) in (0)..(t₀), F (y F x₀ ε s) ∂volume - ∫ (s : ℝ) in (0)..(t₁), F (y F x₀ ε s) ∂volume  ‖ := by [simp]
+    _ = ‖∫ (s : ℝ) in (0)..(t₀), F (y F x₀ ε s) ∂volume + ∫ (s : ℝ) in (t₁)..(0), F (y F x₀ ε s) ∂volume‖ := by rw[←intervalIntegral.integral_symm ]
+    _ = ‖∫ (s : ℝ) in (t₀)..(t₁), F (y F x₀ ε s) ∂volume ‖ := by rw[intervalIntegral.integral_add_adjacent_intervals]
+    _ ≤ M * abs (t₀ - t₁) := by rw[intervalIntegral.norm_integral_le_of_norm_le_const]
 
+  
+ 
 #check Claim1
