@@ -28,4 +28,4 @@ lemma Claim1 : ∀ (ε : NNReal) (t₀ t₁ : ℝ), ‖x F x₀ ε t₀ - x F x�
     _ = ‖(∫ (s : ℝ) in (t₁)..(t₀), F (y F x₀ ε s) )‖ := by
         rw [add_comm,intervalIntegral.integral_add_adjacent_intervals] 
         
-    _ ≤ M * abs (t₀ - t₁) := by rw[intervalIntegral.norm_integral_le_of_norm_le_const]
+    _ ≤ M * abs (t₀ - t₁) := by rw [intervalIntegral.norm_integral_le_of_norm_le_const]

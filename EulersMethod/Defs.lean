@@ -4,12 +4,18 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.NNReal
 import Mathlib.MeasureTheory.Integral.IntervalIntegral
 import Mathlib.Data.Set.Intervals.Basic
+import Mathlib.MeasureTheory.Function.AEEqFun
+import Mathlib.Analysis.Calculus.Deriv.Basic
+import Mathlib.MeasureTheory.Measure.Lebesgue.Basic
+import Mathlib.MeasureTheory.Measure.MeasureSpace
 
 variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
 variable (F : E → E)
 variable (x₀ : E)
+variable (ε : ℝ)
+variable (ε_pos : 0 < ε)
 
-def x_N (ε : NNReal) : ℕ → E
+def x_N (ε : ℝ) : ℕ → E
 | 0 => x₀
 | T + 1 => x_N ε T + ε • F (x_N ε T)
 
@@ -37,21 +43,21 @@ example : x_N F x₀ 1 2 = x₀ + F x₀ + F (x₀ + F x₀) := by
 #check ⌊1 / (2 : ℝ)⌋₊
 #check 1 / 2
 
-noncomputable def N (ε : NNReal) (t : ℝ) :=
+noncomputable def N (ε : ℝ) (t : ℝ) :=
   ⌊t / ε⌋₊
 
-noncomputable def lam (ε : NNReal) (t : ℝ) :=
+noncomputable def lam (ε : ℝ) (t : ℝ) :=
   (t - N ε t) / ε
 
-noncomputable def y (ε : NNReal) (t : ℝ) :=
+noncomputable def y (ε : ℝ) (t : ℝ) :=
   x_N F x₀ ε (N ε t)
 
-noncomputable def x (ε : NNReal) (t : ℝ) := by
+noncomputable def x (ε : ℝ) (t : ℝ) := by
   let lam₀ := lam ε t
   let N₀ := N ε t
   exact y F x₀ ε t + (lam₀ * ε) • F (x_N F x₀ ε N₀)
 
--- noncomputable def x (ε : NNReal) : ℝ → E := by
+-- noncomputable def x (ε : \R) : ℝ → E := by
 --   intro t
 --   let N : ℕ := Nat.floor (t / ε)
 --   let l : ℝ := (t - N) / ε
@@ -81,7 +87,26 @@ example : x F x₀ 1 (half : ℝ) = x₀ + half • F (x₀) := by
   -- simp [Nat.floor]
   -- norm_num
 
-#check deriv
+-- #check deriv
+
+open MeasureTheory
+
+#check MeasureTheory.MeasureSpace.volume
+
+noncomputable def μ : MeasureTheory.Measure ℝ := MeasureTheory.MeasureSpace.volume
+
+def NNR_Set : Set ℝ := fun (r : ℝ) => 0 ≤ r
+def NNR_Subtype := NNR_Set
+noncomputable def μ₀ : Measure NNR_Set := volume
+
+-- instance : NontriviallyNormedField NNR_Set where
+--   non_trivial := sorry
+
+#check deriv (x F x₀ ε) =ᵐ[μ₀] y F x₀ ε
+
+-- lemma deriv_x_eqae_y : deriv (x F x₀ ε) =ᵐ[μ₀] y F x₀ ε := by
+--   rw [Filter.EventuallyEq, Filter.Eventually]
+--   sorry
 
 lemma piecewise_constant_ode : ∀ N : ℕ, y F x₀ ε (N*ε) = x₀ + ∫ (s : ℝ) in (0)..(N*ε), F (y F x₀ ε s) ∂volume := by
   intro N
