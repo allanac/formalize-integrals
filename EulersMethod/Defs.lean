@@ -81,6 +81,8 @@ example : x F x₀ 1 (half : ℝ) = x₀ + half • F (x₀) := by
   -- simp [Nat.floor]
   -- norm_num
 
+#check deriv
+
 lemma piecewise_constant_ode : ∀ N : ℕ, y F x₀ ε (N*ε) = x₀ + ∫ (s : ℝ) in (0)..(N*ε), F (y F x₀ ε s) ∂volume := by
   intro N
   induction' N with k Ik
