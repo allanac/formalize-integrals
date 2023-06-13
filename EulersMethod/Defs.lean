@@ -41,10 +41,13 @@ noncomputable def N (ε : NNReal) (t : ℝ) :=
 noncomputable def lam (ε : NNReal) (t : ℝ) :=
   (t - N ε t) / ε
 
+noncomputable def y (ε : NNReal) (t : ℝ) :=
+  x_N F x₀ ε (N ε t)
+
 noncomputable def x (ε : NNReal) (t : ℝ) := by
   let lam₀ := lam ε t
   let N₀ := N ε t
-  exact (1 - lam₀) • (x_N F x₀ ε N₀) + lam₀ • (x_N F x₀ ε (N₀ + 1))
+  exact y F x₀ ε t + (lam₀ * ε) • F (x_N F x₀ ε N₀)
 
 -- noncomputable def x (ε : NNReal) : ℝ → E := by
 --   intro t
@@ -68,14 +71,7 @@ example : x F x₀ 1 (half : ℝ) = x₀ + half • F (x₀) := by
   rw [x, h₀]
   have h₁ : lam 1 half = half := by
     simp [lam, h₀]
-  simp [x_N, h₀, h₁]
-  simp [add_comm]
-  rw [add_comm (half • x₀), add_assoc, ← add_smul]
-  norm_num
-  apply add_comm
-
-noncomputable def y (ε : NNReal) (t : ℝ) :=
-  x_N F x₀ ε (N ε t)
+  simp [x_N, h₀, h₁, y]
 
 #check add_smul
   -- [← left_distrib]
