@@ -2,8 +2,10 @@
 import Mathlib.Analysis.NormedSpace.Basic
 import Mathlib.Data.Real.Basic
 import Mathlib.Data.Real.NNReal
+import Mathlib.MeasureTheory.Integral.IntervalIntegral
+import Mathlib.Data.Set.Intervals.Basic
 
-variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E]
+variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
 variable (F : E → E)
 variable (x₀ : E)
 
@@ -78,6 +80,20 @@ example : x F x₀ 1 (half : ℝ) = x₀ + half • F (x₀) := by
   -- norm_num
   -- simp [Nat.floor]
   -- norm_num
+
+lemma piecewise_constant_ode : ∀ N : ℕ, y F x₀ ε (N*ε) = x₀ + ∫ (s : ℝ) in (0)..(N*ε), F (y F x₀ ε s) ∂volume := by
+  intro N
+  induction' N with k Ik
+  · simp [y, N, x_N]
+  · simp [y, N]
+    calc
+    _ = x_N F x₀ ε k + ε • F (x_N F x₀ ε k) := by sorry
+    _ = y F x₀ ε (k*ε) + ε • F (y F x₀ ε (k*ε)) := by sorry
+    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + ε • F (y F x₀ ε (k*ε)) := by sorry
+    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), (1 : ℝ) ∂volume) • F (y F x₀ ε (k*ε)) := by sorry
+    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), F (y F x₀ ε (k*ε)) ∂volume) := by sorry
+    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), F (y F x₀ ε s) ∂volume) := by sorry
+    _ = x₀ + (∫ (s : ℝ) in (0)..((k+1)*ε), F (y F x₀ ε s) ∂volume) := by sorry
 
 #check abs (α := ℝ)
 #check norm
