@@ -13,7 +13,7 @@ variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 #check norm
 #check Set.Ico
 
-def meas_a (ε : ℝ) (k : ℕ) : ℝ := k*ε
+private def meas_a (ε : ℝ) (k : ℕ) : ℝ := k*ε
 
 variable (r : ℝ)
 
