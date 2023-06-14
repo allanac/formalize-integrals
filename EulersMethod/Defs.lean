@@ -373,7 +373,9 @@ theorem der_x_eq_Fy (t : ℝ) : (t ∉ bad_set ε) → (HasDerivAt (x F x₀ ε)
     sorry --apply HasDerivAt.congr_of_eventuallyEq _ (x_cong_x_alt F x₀ ε ε_pos N₀ t this).symm
 
 theorem bad_set_almost_nowhere : volume (bad_set ε) = 0 := by
-  sorry
+  apply Set.Countable.measure_zero
+  apply Set.Countable.image
+  apply Set.to_countable
 
 -- instance : NontriviallyNormedField NNR_Set where
 --   non_trivial := sorry
