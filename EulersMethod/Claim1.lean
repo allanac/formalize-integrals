@@ -79,7 +79,7 @@ lemma Fy_measurable : ∀ (t₁ t₀ ε : ℝ) (_ : 0 < ε) (_ : t₁ < t₀) (_
 
 #check Fy_measurable
 
-lemma Claim1 : ∀ (ε : ℝ) {_ : 0 < ε} (t₀ t₁ : ℝ) {_ : 0 < t₁} {_ : 0 < t₀}, ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := by
+lemma Claim1 : ∀ (ε : ℝ) (_ : 0 < ε) (t₀ t₁ : ℝ) (_ : 0 < t₁) (_ : 0 < t₀), ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := by
   intro ε epos t₀ t₁ t1pos t0pos
   calc
     ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ = 
@@ -95,3 +95,5 @@ lemma Claim1 : ∀ (ε : ℝ) {_ : 0 < ε} (t₀ t₁ : ℝ) {_ : 0 < t₁} {_ :
       apply intervalIntegral.norm_integral_le_of_norm_le_const
       intro _ _
       apply F_bdd
+
+#check Claim1
