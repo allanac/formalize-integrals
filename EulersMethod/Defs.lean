@@ -379,6 +379,7 @@ theorem bad_set_almost_nowhere : volume (bad_set ε) = 0 := by
 --   non_trivial := sorry
 
 #check (fun t => deriv (x F x₀ ε) t) =ᵐ[μ₀] (fun t => y F x₀ ε t)
+-- #check deriv (x F x₀ ε) =ᵐ[μ₀] y F x₀ ε
 
 #check ite_ae_eq_of_measure_zero
 
