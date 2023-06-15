@@ -220,3 +220,5 @@ lemma Claim1 : ∀ (ε : ℝ) {_ : 0 < ε} (t₀ t₁ : ℝ) {_ : 0 ≤ t₁} {_
       apply intervalIntegral.norm_integral_le_of_norm_le_const
       intro _ _
       apply F_bdd
+
+#check Claim1

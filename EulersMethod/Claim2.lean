@@ -16,5 +16,5 @@ variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 def meas_a (ε : ℝ) (k : ℕ) : ℝ := k*ε
 
 variable (r : ℝ)
-theorem uniformlyBounded : ∃ M, ∀ ε > (0 : ℕ), ∀ t ∈ Icc 0 1, ‖x F x₀ ε t‖ ≤ M := by 
+theorem uniformlyBounded : ∃ M, ∀ ε > (0 : ℝ), ∀ t ∈ Icc 0 1, ‖x F x₀ ε t‖ ≤ M := by 
   sorry
