@@ -23,8 +23,11 @@ variable (x₀ : E)
 variable (M : NNReal)
 variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 
+noncomputable def y_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
+| t => y F x₀ (1/((k : ℝ)+1)) t
+
 noncomputable def x_c' (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
-| t => x F x₀ (1/((k : ℝ)+1)) (t)
+| t => x F x₀ (1/((k : ℝ)+1)) t
 open ENNReal
 lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith M (x_c' F x₀ k) := by
   intro k
@@ -48,11 +51,12 @@ lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith M (x_c' F x₀ k) := by
     apply (Set.mem_Icc.mp z1h).left
 
 #check x_is_lipschitz F x₀ M
+#check uniformlyBounded
 --set_option pp.all true
 noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
   toFun := x_c' F x₀ k
   map_bounded' := by
-    obtain ⟨C, hc⟩ := uniformlyBounded F x₀
+    obtain ⟨C, hc⟩ := uniformlyBounded F x₀ M
     simp
     use 2*C
     intro a ha b hb
@@ -107,7 +111,13 @@ noncomputable def x_subseq := (x_subseq_exists F x₀ M F_bdd).choose
 #check x_subseq F x₀ M F_bdd
 def x_subseq_spec := (x_subseq_exists F x₀ M F_bdd).choose_spec
 
-#check x_L
+#check x_L F x₀ M F_bdd
+#check x_subseq
 #check x_L_spec
+#check y_c F x₀
+#check fun (z:ℕ) => (y_c F x₀ (x_subseq F x₀ M F_bdd z))
 
--- lemma y_converges :
+open Filter
+#check nhds
+#check Tendsto (fun z => (y F x₀ (x_subseq F x₀ M F_bdd z ))) atTop
+lemma y_converges : Tendsto (fun z => (y_c F x₀ (x_subseq F x₀ M F_bdd z ))) atTop (nhds (x_L F x₀ M F_bdd).toFun) := by sorry
