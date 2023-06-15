@@ -376,6 +376,22 @@ lemma N_of_good {N₀ : ℕ} {t : ℝ} (th : (good_ival N₀ ε) t) : N ε t = N
   exact ε_pos
   apply Set.Ioo_subset_Ico_self th
 
+@[simp]
+theorem N_zero_eq_zero : N ε 0 = 0 := by
+  apply N_of_ico
+  exact ε_pos
+  constructor
+  simp
+  simp
+  exact ε_pos
+
+#check x
+@[simp]
+theorem x_at_zero : (x F x₀ ε 0) = x₀ := by
+  unfold x y lam
+  simp [ε_pos]
+  unfold x_N; rfl
+
 theorem x_cong_x_alt_closed {N₀ : ℕ} {t : ℝ} (th : (closed_ival N₀ ε) t) : x_alt F x₀ ε N₀ t = x F x₀ ε t := by
   rcases th with ⟨tlb, tub⟩
   rcases eq_or_lt_of_le tub with (teq | tub)
