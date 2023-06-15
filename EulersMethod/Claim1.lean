@@ -2,15 +2,25 @@ import EulersMethod.Defs
 import Mathlib.MeasureTheory.Integral.FundThmCalculus
 
 open MeasureTheory
+open scoped BoundedContinuousFunction
+
 variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-variable (F : E → E)
+variable (F : E →ᵇ E)
 variable (x₀ : E)
 variable (ε : ℝ)
 variable (ε_pos : 0 < ε)
 
-variable (M : ℝ) (M_nn : 0 ≤ M)
-variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
+-- noncomputable def M := ‖F‖
+noncomputable def M := ‖F‖₊
 
+#check norm_le_pi_norm
+
+theorem F_bdd : ∀ e : E, ‖F e‖ ≤ ‖F‖ := BoundedContinuousFunction.norm_coe_le_norm F
+
+-- theorem F_bdd : ∀ e : E, ‖F e‖ ≤ ‖F‖ := by
+--   apply BoundedContinuousFunction.norm_coe_le_norm
+
+-- variable (M : ℝ) (M_nn : 0 ≤ M)
 
 #check abs (α := ℝ)
 #check norm
@@ -250,7 +260,9 @@ lemma ftc_on_x : ∀ t, 0 ≤ t → x F x₀ ε t - x₀ = ∫ (s : ℝ) in (0).
   exact tnn
   exact this
 
-lemma Claim1 : ∀ (ε : ℝ) (_ : 0 < ε) (t₀ t₁ : ℝ) (_ : 0 ≤ t₁) (_ : 0 ≤ t₀), ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := by
+#check M
+
+lemma Claim1 : ∀ (ε : ℝ) (_ : 0 < ε) (t₀ t₁ : ℝ) (_ : 0 ≤ t₁) (_ : 0 ≤ t₀), ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M F * |t₀ - t₁| := by
   intro ε epos t₀ t₁ t1nn t0nn
   calc
     ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ = 
@@ -269,7 +281,7 @@ lemma Claim1 : ∀ (ε : ℝ) (_ : 0 < ε) (t₀ t₁ : ℝ) (_ : 0 ≤ t₁) (_
         · apply IntervalIntegrable.symm
           apply Fy_measurable F x₀ 0 t₁ ε epos t1nn (le_refl 0)
         · apply Fy_measurable F x₀ 0 t₀ ε epos t0nn (le_refl 0)
-    _ ≤ M * abs (t₀ - t₁) := by
+    _ ≤ M F * abs (t₀ - t₁) := by
       apply intervalIntegral.norm_integral_le_of_norm_le_const
       intro _ _
       apply F_bdd
