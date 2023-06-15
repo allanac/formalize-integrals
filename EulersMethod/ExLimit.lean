@@ -52,7 +52,7 @@ lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith M (x_c' F x₀ k) := by
 noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
   toFun := x_c' F x₀ k
   map_bounded' := by
-    obtain ⟨C, hc⟩ := uniformlyBounded F x₀
+    obtain ⟨C, hc⟩ := uniformlyBounded F x₀ M.val M.property F_bdd
     simp
     use 2*C
     intro a ha b hb
