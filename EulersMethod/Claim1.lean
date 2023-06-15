@@ -121,7 +121,7 @@ lemma Fy_measurable' : ∀ (t₁ t₀ ε : ℝ) (_ : 0 < ε) (_ : 0 ≤ t₀) (_
 
 #check Fy_measurable
 
-lemma ftc_on_x : ∀ (N₀ : ℕ) t, 0 ≤ t → t ≤ N₀ * ε → x F x₀ ε t - x₀ = ∫ (s : ℝ) in (0)..(t), F (y F x₀ ε s) := by
+lemma ftc_on_x_bdd : ∀ (N₀ : ℕ) t, 0 ≤ t → t ≤ N₀ * ε → x F x₀ ε t - x₀ = ∫ (s : ℝ) in (0)..(t), F (y F x₀ ε s) := by
   intro N₀
   induction' N₀ with N₀ ih
   intro t tnn tnp
@@ -180,8 +180,36 @@ lemma ftc_on_x : ∀ (N₀ : ℕ) t, 0 ≤ t → t ≤ N₀ * ε → x F x₀ ε
     linarith
   rw [← x_cong_x_alt_closed (th := h₀), ← x_cong_x_alt_closed (th := h₁)]
   unfold intervalIntegral
-  -- rw [MeasureTheory.integral_Ioc_eq_integral_Ioo]
-  sorry
+  rw [MeasureTheory.integral_Ioc_eq_integral_Ioo]
+  have : Set.Ioc t (N₀ * ε) = ∅ := by
+    rw [Set.Ioc_eq_empty_iff]
+    linarith
+  rw [this]
+  simp
+  have : (∫ (t : ℝ) in Set.Ioo (↑N₀ * ε) t, F (y F x₀ ε t)) = (∫ (_ : ℝ) in (↑N₀ * ε)..(t), F (x_N F x₀ ε N₀)) :=
+    calc
+      (∫ (t : ℝ) in Set.Ioo (↑N₀ * ε) t, F (y F x₀ ε t)) = (∫ (_ : ℝ) in Set.Ioo (↑N₀ * ε) t, F (x_N F x₀ ε N₀)) := by
+        apply MeasureTheory.set_integral_congr
+        simp
+        intro u uh
+        dsimp
+        have ug : u ∈ good_ival N₀ ε := by
+          apply Set.Ioo_subset_Ioo_right _ uh
+          simp at tub
+          exact tub
+        rw [y_eq_xN_of_good _ _ _ ε_pos ug]
+      _ = _ := by
+        unfold intervalIntegral
+        rw [this]
+        simp
+  rw [this]
+  apply intervalIntegral.integral_eq_sub_of_hasDerivAt (f := x_alt F x₀ ε N₀)
+  intro v _
+  apply deriv_x_alt_eq
+  exact ε_pos
+  apply intervalIntegrable_const
+  exact ε_pos
+  exact ε_pos
   -- apply intervalIntegral.integral_eq_sub_of_hasDerivAt_of_tendsto (f := x_alt F x₀ ε N₀)
   -- exact tlb
   -- intro u uh
@@ -201,14 +229,39 @@ lemma ftc_on_x : ∀ (N₀ : ℕ) t, 0 ≤ t → t ≤ N₀ * ε → x F x₀ ε
   -- apply ε_pos
   -- apply le_of_lt tlb
   -- apply nat_ep_nonneg ε_pos
-  sorry
-  sorry
+
+lemma ftc_on_x : ∀ t, 0 ≤ t → x F x₀ ε t - x₀ = ∫ (s : ℝ) in (0)..(t), F (y F x₀ ε s) := by
+  intro t tnn
+  let N₀ : ℕ := ⌈t / ε⌉₊
+  have : t ≤ N₀ * ε := by
+    have : Eq N₀ ⌈t / ε⌉₊ := by rfl
+    rw [this]
+    have : t = t / ε * ε := by
+      symm
+      apply div_mul_cancel
+      linarith
+    rw [this]
+    apply mul_le_mul_of_nonneg_right
+    rw [← this]
+    apply Nat.le_ceil
+    linarith
+  apply ftc_on_x_bdd
+  exact ε_pos
+  exact tnn
+  exact this
 
 lemma Claim1 : ∀ (ε : ℝ) {_ : 0 < ε} (t₀ t₁ : ℝ) {_ : 0 ≤ t₁} {_ : 0 ≤ t₀}, ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := by
   intro ε epos t₀ t₁ t1nn t0nn
   calc
     ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ = 
-     ‖ x₀ + (∫ (s : ℝ) in (0)..(t₀), F (y F x₀ ε s) ) - x₀ - (∫ (s : ℝ) in (0)..(t₁), F (y F x₀ ε s) )‖ := by sorry
+     ‖ x₀ + (∫ (s : ℝ) in (0)..(t₀), F (y F x₀ ε s) ) - x₀ - (∫ (s : ℝ) in (0)..(t₁), F (y F x₀ ε s) )‖ := by
+      have : x F x₀ ε t₀ - x F x₀ ε t₁ = (x F x₀ ε t₀ - x₀) - (x F x₀ ε t₁ - x₀) := by simp
+      rw [this, ftc_on_x, ftc_on_x]
+      simp
+      exact epos
+      exact t1nn
+      exact epos
+      exact t0nn
     _ = ‖(∫ (s : ℝ) in (0)..(t₀), F (y F x₀ ε s) ) + (-∫ (s : ℝ) in (0)..(t₁), F (y F x₀ ε s))‖ := by rw[← sub_eq_add_neg] ; simp
     _ = ‖(∫ (s : ℝ) in (0)..(t₀), F (y F x₀ ε s) ) + (∫ (s : ℝ) in (t₁)..(0), F (y F x₀ ε s) )‖ := by rw[←intervalIntegral.integral_symm ]
     _ = ‖(∫ (s : ℝ) in (t₁)..(t₀), F (y F x₀ ε s) )‖ := by

@@ -283,7 +283,7 @@ theorem deriv_x_alt_eq (N₀ : ℕ) : ∀ t : ℝ, HasDerivAt (x_alt F x₀ ε N
 #check Filter.mem_of_superset
 
 def good_ival (N₀ : ℕ) (ε : ℝ) : Set ℝ := Set.Ioo (N₀ * ε) ((N₀ + 1) * ε)
--- def sgood_left (N₀ : ℕ) (ε : ℝ) : Set ℝ := Set.Ico (N₀ * ε) ((N₀ + 1) * ε)
+def good_ico (N₀ : ℕ) (ε : ℝ) : Set ℝ := Set.Ico (N₀ * ε) ((N₀ + 1) * ε)
 -- def sgood_right (N₀ : ℕ) (ε : ℝ) : Set ℝ := Set.Ioc (N₀ * ε) ((N₀ + 1) * ε)
 def closed_ival (N₀ : ℕ) (ε : ℝ) : Set ℝ := Set.Icc (N₀ * ε) ((N₀ + 1) * ε)
 
@@ -346,6 +346,36 @@ lemma nat_ep_nonneg {N₀ : ℕ} {ε : ℝ} : 0 < ε → 0 ≤ N₀ * ε := by
   simp
   linarith
 
+lemma N_of_ico {N₀ : ℕ} {t : ℝ} (th : t ∈ good_ico N₀ ε) : N ε t = N₀ := by
+  rcases th with ⟨tlb, tub⟩
+  rw [N, Nat.floor_eq_iff]
+  constructor
+  calc
+    N₀ = N₀ * ε / ε := by
+      symm
+      apply mul_div_cancel
+      linarith
+    _ ≤ _ := by
+      rw [div_le_div_right]
+      linarith
+      assumption
+  have : (N₀ + 1) = (N₀ + 1) * ε / ε := by symm; apply mul_div_cancel; linarith
+  rw [this]
+  rw [div_lt_div_right]
+  exact tub
+  exact ε_pos
+  apply div_nonneg
+  apply le_trans (b := N₀ * ε)
+  apply nat_ep_nonneg
+  exact ε_pos
+  exact tlb
+  apply le_of_lt ε_pos
+
+lemma N_of_good {N₀ : ℕ} {t : ℝ} (th : (good_ival N₀ ε) t) : N ε t = N₀ := by
+  apply N_of_ico
+  exact ε_pos
+  apply Set.Ioo_subset_Ico_self th
+
 theorem x_cong_x_alt_closed {N₀ : ℕ} {t : ℝ} (th : (closed_ival N₀ ε) t) : x_alt F x₀ ε N₀ t = x F x₀ ε t := by
   rcases th with ⟨tlb, tub⟩
   rcases eq_or_lt_of_le tub with (teq | tub)
@@ -368,28 +398,9 @@ theorem x_cong_x_alt_closed {N₀ : ℕ} {t : ℝ} (th : (closed_ival N₀ ε) t
   simp
   linarith
   have N_eq : N ε t = N₀ := by
-    rw [N, Nat.floor_eq_iff]
-    constructor
-    calc
-      N₀ = N₀ * ε / ε := by
-        symm
-        apply mul_div_cancel
-        linarith
-      _ ≤ _ := by
-        rw [div_le_div_right]
-        linarith
-        assumption
-    have : (N₀ + 1) = (N₀ + 1) * ε / ε := by symm; apply mul_div_cancel; linarith
-    rw [this]
-    rw [div_lt_div_right]
-    exact tub
+    apply N_of_ico
     exact ε_pos
-    apply div_nonneg
-    apply le_trans (b := N₀ * ε)
-    apply nat_ep_nonneg
-    exact ε_pos
-    exact tlb
-    apply le_of_lt ε_pos
+    exact ⟨tlb, tub⟩
   unfold x x_alt y lam lam_alt
   rw [N_eq]
     --   apply mul_nonneg
@@ -402,6 +413,15 @@ theorem x_cong_x_alt_closed {N₀ : ℕ} {t : ℝ} (th : (closed_ival N₀ ε) t
   -- simp
 
 -- theorem x_cong_x_alt' {N₀ : ℕ} {t : ℝ} (th : (good_ival N₀ ε) t) : 
+
+lemma y_eq_xN_of_gico {N₀ : ℕ} {t : ℝ} (th : (good_ico N₀ ε) t) : y F x₀ ε t = x_N F x₀ ε N₀ := by
+  unfold y
+  rw [N_of_ico _ ε_pos th]
+
+lemma y_eq_xN_of_good {N₀ : ℕ} {t : ℝ} (th : (good_ival N₀ ε) t) : y F x₀ ε t = x_N F x₀ ε N₀ := by
+  apply y_eq_xN_of_gico
+  apply ε_pos
+  apply Set.Ioo_subset_Ico_self th
 
 theorem x_cong_x_alt {N₀ : ℕ} {t : ℝ} (th : (good_ival N₀ ε) t) : x_alt F x₀ ε N₀ =ᶠ[nhds t] x F x₀ ε := by
   let u : Set ℝ := good_ival N₀ ε -- Set.Ioo (N₀ * ε) ((N₀ + 1) * ε)
