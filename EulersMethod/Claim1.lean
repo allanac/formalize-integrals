@@ -204,7 +204,7 @@ lemma ftc_on_x : ∀ (N₀ : ℕ) t, 0 ≤ t → t ≤ N₀ * ε → x F x₀ ε
   sorry
   sorry
 
-lemma Claim1 : ∀ (ε : ℝ) {_ : 0 < ε} (t₀ t₁ : ℝ) {_ : 0 ≤ t₁} {_ : 0 ≤ t₀}, ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := by
+lemma Claim1 : ∀ (ε : ℝ) (_ : 0 < ε) (t₀ t₁ : ℝ) (_ : 0 ≤ t₁) (_ : 0 ≤ t₀), ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ ≤ M * |t₀ - t₁| := by
   intro ε epos t₀ t₁ t1nn t0nn
   calc
     ‖x F x₀ ε t₀ - x F x₀ ε t₁‖ = 

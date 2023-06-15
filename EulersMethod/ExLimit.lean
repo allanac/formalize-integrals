@@ -3,7 +3,7 @@ import EulersMethod.Claim1
 import EulersMethod.Claim2
 --import Std.Tactic.Infer
 
--- The xk(·) are uniformly bounded on [0,1]: 
+-- The xk(·) are uniformly bounded on [0,1]:
 -- sup sup |xk(t)| < ∞. k t∈[0,1]
 
 open scoped BoundedContinuousFunction
@@ -30,25 +30,29 @@ lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith M (x_c' F x₀ k) := by
   intro k
   rw [lipschitzWith_iff_dist_le_mul]
   intro z1 z2
-  rw [dist_eq_norm]
-  have : M * dist z1 z2 = M * norm ((z1:ℝ)-(z2:ℝ)) := by sorry
+  have : M * dist z1 z2 = M * norm ((z1:ℝ)-(z2:ℝ)) := by
+    rw [mul_eq_mul_left_iff]
+    left
+    rfl
+  simp
   rw [this]
   rw [x_c',x_c']
   simp
-  have := Claim1 F x₀ M F_bdd (1/((k : ℝ)+1)) (one_div_pos.mpr (Nat.cast_add_one_pos _)) z1 z2 
+  have := Claim1 F x₀ M F_bdd (1/((k : ℝ)+1)) (one_div_pos.mpr (Nat.cast_add_one_pos _)) z1 z2
   simp at *
+  rw [dist_eq_norm]
   apply this
-  sorry
-  sorry
-  --· rcases z2 with ⟨z2', z2h⟩
-  --sorry
+  · rcases z2 with ⟨z2', z2h⟩
+    apply (Set.mem_Icc.mp z2h).left
+  · rcases z1 with ⟨z1', z1h⟩
+    apply (Set.mem_Icc.mp z1h).left
 
 #check x_is_lipschitz F x₀ M
 --set_option pp.all true
 noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
   toFun := x_c' F x₀ k
   map_bounded' := by
-    obtain ⟨C, hc⟩ := uniformlyBounded F x₀ 
+    obtain ⟨C, hc⟩ := uniformlyBounded F x₀
     simp
     use 2*C
     intro a ha b hb
@@ -74,7 +78,7 @@ noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
   continuous_toFun := LipschitzWith.continuous (x_is_lipschitz F x₀ M F_bdd k)
 
 
-#check x_c F x₀_M
+#check x_c F x₀ M
 
 #check x
 
@@ -82,11 +86,9 @@ noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
 lemma x_c_eq_cont_at  (a : Set.Icc 0 1) : EquicontinuousAt (fun n ↦ (x_c F x₀ M F_bdd n).toFun) a := by sorry
 -- use Claim1 here
 
-lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ M F_bdd n).toFun) := by sorry
--- use previous lemma
+lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ M F_bdd n).toFun) := x_c_eq_cont_at F x₀ M F_bdd
 
--- has to be redefined: structures
-def A := Set.range (x_c F x₀ M F_bdd) 
+def A := Set.range (x_c F x₀ M F_bdd)
 
 
 #check A
@@ -108,4 +110,4 @@ def x_subseq_spec := (x_subseq_exists F x₀ M F_bdd).choose_spec
 #check x_L
 #check x_L_spec
 
--- lemma y_converges : 
+-- lemma y_converges :
