@@ -24,9 +24,8 @@ theorem uniformlyBounded : ∃ M, ∀ ε > (0 : ℝ), ∀ t ∈ Icc 0 1, ‖x F 
   calc
     ‖(x F x₀ ε t - x₀) + x₀‖ ≤ ‖x F x₀ ε t - x₀‖ + ‖x₀‖ := by
       apply norm_add_le
-    _ ≤ M * t := by
+    _ ≤ M * t + ‖x₀‖ := by
       simp
-      apply le_trans
       have : x F x₀ ε t - x₀ = x F x₀ ε t - x F x₀ ε 0 := by simp [ε_pos]
       rw [this]
       have : t = |t| := by
@@ -37,7 +36,15 @@ theorem uniformlyBounded : ∃ M, ∀ ε > (0 : ℝ), ∀ t ∈ Icc 0 1, ‖x F 
       have : M * t = M * |t - 0| := by
         simp; left; exact this
       rw [this]
-      -- apply Claim1
-      sorry
+      apply Claim1
+      all_goals
+        first
+        | linarith
+        | done
+      exact F_bdd
     _ ≤ _ := by
-      sorry
+      simp
+      calc
+        M * t ≤ M * 1 := by
+          apply mul_le_mul_of_nonneg_left <;> assumption
+        _ ≤ _ := by simp
