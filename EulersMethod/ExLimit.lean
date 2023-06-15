@@ -16,12 +16,12 @@ open MeasureTheory
 section
 
 variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-variable (F : E → E)
+variable (F : E →ᵇ E)
 variable (x₀ : E)
 #where
 
-variable (M : NNReal)
-variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
+-- variable (M : NNReal)
+-- variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 
 noncomputable def y_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
 | t => y F x₀ (1/((k : ℝ)+1)) t
@@ -29,11 +29,11 @@ noncomputable def y_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
 noncomputable def x_c' (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
 | t => x F x₀ (1/((k : ℝ)+1)) t
 open ENNReal
-lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith M (x_c' F x₀ k) := by
+lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith (M F) (x_c' F x₀ k) := by
   intro k
   rw [lipschitzWith_iff_dist_le_mul]
   intro z1 z2
-  have : M * dist z1 z2 = M * norm ((z1:ℝ)-(z2:ℝ)) := by
+  have : M F * dist z1 z2 = M F * norm ((z1:ℝ)-(z2:ℝ)) := by
     rw [mul_eq_mul_left_iff]
     left
     rfl
@@ -41,7 +41,7 @@ lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith M (x_c' F x₀ k) := by
   rw [this]
   rw [x_c',x_c']
   simp
-  have := Claim1 F x₀ M F_bdd (1/((k : ℝ)+1)) (one_div_pos.mpr (Nat.cast_add_one_pos _)) z1 z2
+  have := Claim1 F x₀ (1/((k : ℝ)+1)) (one_div_pos.mpr (Nat.cast_add_one_pos _)) z1 z2
   simp at *
   rw [dist_eq_norm]
   apply this
@@ -50,13 +50,12 @@ lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith M (x_c' F x₀ k) := by
   · rcases z1 with ⟨z1', z1h⟩
     apply (Set.mem_Icc.mp z1h).left
 
-#check x_is_lipschitz F x₀ M
-#check uniformlyBounded
+#check x_is_lipschitz F x₀
 --set_option pp.all true
 noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
   toFun := x_c' F x₀ k
   map_bounded' := by
-    obtain ⟨C, hc⟩ := uniformlyBounded F x₀ M.val M.property F_bdd
+    obtain ⟨C, hc⟩ := uniformlyBounded F x₀
     simp
     use 2*C
     intro a ha b hb
@@ -79,45 +78,45 @@ noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
       · apply Nat.cast_add_one_pos
       · tauto
     _ ≤ 2*C := by linarith
-  continuous_toFun := LipschitzWith.continuous (x_is_lipschitz F x₀ M F_bdd k)
+  continuous_toFun := LipschitzWith.continuous (x_is_lipschitz F x₀ k)
 
 
-#check x_c F x₀ M
+#check x_c F x₀
 
 #check x
 
 
-lemma x_c_eq_cont_at  (a : Set.Icc 0 1) : EquicontinuousAt (fun n ↦ (x_c F x₀ M F_bdd n).toFun) a := by sorry
+lemma x_c_eq_cont_at  (a : Set.Icc 0 1) : EquicontinuousAt (fun n ↦ (x_c F x₀ n).toFun) a := by sorry
 -- use Claim1 here
 
-lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ M F_bdd n).toFun) := x_c_eq_cont_at F x₀ M F_bdd
+lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ n).toFun) := x_c_eq_cont_at F x₀
 
-def A := Set.range (x_c F x₀ M F_bdd)
+def A := Set.range (x_c F x₀)
 
 
 #check A
 
-lemma A_is_compact : IsCompact (A F x₀ M F_bdd) := by sorry
+lemma A_is_compact : IsCompact (A F x₀) := by sorry
 -- need Arzela-Ascoli here
 
-lemma A_is_seq_compact : IsSeqCompact (A F x₀ M F_bdd) := IsCompact.isSeqCompact (A_is_compact F x₀ M F_bdd)
+lemma A_is_seq_compact : IsSeqCompact (A F x₀) := IsCompact.isSeqCompact (A_is_compact F x₀)
 
-def x_exists := ((A_is_seq_compact (x := x_c F x₀ M F_bdd) F x₀ M F_bdd) (by simp; intro n; rw [A]; aesop))
-noncomputable def x_L := (x_exists F x₀ M F_bdd).choose
-def x_L_spec := (x_exists F x₀ M F_bdd).choose_spec
+def x_exists := ((A_is_seq_compact (x := x_c F x₀) F x₀) (by simp; intro n; rw [A]; aesop))
+noncomputable def x_L := (x_exists F x₀).choose
+def x_L_spec := (x_exists F x₀).choose_spec
 
-def x_subseq_exists := (x_L_spec F x₀ M F_bdd).right
-noncomputable def x_subseq := (x_subseq_exists F x₀ M F_bdd).choose
-#check x_subseq F x₀ M F_bdd
-def x_subseq_spec := (x_subseq_exists F x₀ M F_bdd).choose_spec
+def x_subseq_exists := (x_L_spec F x₀).right
+noncomputable def x_subseq := (x_subseq_exists F x₀).choose
+#check x_subseq F x₀
+def x_subseq_spec := (x_subseq_exists F x₀).choose_spec
 
-#check x_L F x₀ M F_bdd
+#check x_L F x₀
 #check x_subseq
 #check x_L_spec
 #check y_c F x₀
-#check fun (z:ℕ) => (y_c F x₀ (x_subseq F x₀ M F_bdd z))
+#check fun (z:ℕ) => (y_c F x₀ (x_subseq F x₀ z))
 
 open Filter
 #check nhds
-#check Tendsto (fun z => (y F x₀ (x_subseq F x₀ M F_bdd z ))) atTop
-lemma y_converges : Tendsto (fun z => (y_c F x₀ (x_subseq F x₀ M F_bdd z ))) atTop (nhds (x_L F x₀ M F_bdd).toFun) := by sorry
+#check Tendsto (fun z => (y F x₀ (x_subseq F x₀ z ))) atTop
+lemma y_converges : Tendsto (fun z => (y_c F x₀ (x_subseq F x₀ z ))) atTop (nhds (x_L F x₀).toFun) := by sorry

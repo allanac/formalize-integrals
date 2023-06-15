@@ -14,8 +14,10 @@ import Mathlib.Topology.Filter
 import Mathlib.MeasureTheory.Integral.FundThmCalculus
 import Mathlib.MeasureTheory.Integral.DivergenceTheorem
 
+open scoped BoundedContinuousFunction
+
 variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
-variable (F : E → E)
+variable (F : E →ᵇ E)
 variable (x₀ : E)
 variable (ε : ℝ)
 variable (ε_pos : 0 < ε)
