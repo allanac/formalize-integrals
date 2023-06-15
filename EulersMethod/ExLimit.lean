@@ -23,8 +23,11 @@ variable (x₀ : E)
 -- variable (M : NNReal)
 -- variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 
+noncomputable def y_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
+| t => y F x₀ (1/((k : ℝ)+1)) t
+
 noncomputable def x_c' (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
-| t => x F x₀ (1/((k : ℝ)+1)) (t)
+| t => x F x₀ (1/((k : ℝ)+1)) t
 open ENNReal
 lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith (M F) (x_c' F x₀ k) := by
   intro k
@@ -107,7 +110,13 @@ noncomputable def x_subseq := (x_subseq_exists F x₀).choose
 #check x_subseq F x₀
 def x_subseq_spec := (x_subseq_exists F x₀).choose_spec
 
-#check x_L
+#check x_L F x₀
+#check x_subseq
 #check x_L_spec
+#check y_c F x₀
+#check fun (z:ℕ) => (y_c F x₀ (x_subseq F x₀ z))
 
--- lemma y_converges :
+open Filter
+#check nhds
+#check Tendsto (fun z => (y F x₀ (x_subseq F x₀ z ))) atTop
+lemma y_converges : Tendsto (fun z => (y_c F x₀ (x_subseq F x₀ z ))) atTop (nhds (x_L F x₀).toFun) := by sorry
