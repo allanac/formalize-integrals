@@ -23,13 +23,15 @@ variable (x₀ : E)
 -- variable (M : NNReal)
 -- variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 
-noncomputable def y_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
+noncomputable def y_c (k : ℕ) : ℝ → E
 | t => y F x₀ (1/((k : ℝ)+1)) t
 
-noncomputable def x_c' (k : ℕ) : (Set.Icc 0 (1 : ℝ)) → E
+noncomputable def x_c' (k : ℕ) : (Set.Icc 0 1 : Set ℝ) → E
 | t => x F x₀ (1/((k : ℝ)+1)) t
+noncomputable def x_c'' (k : ℕ) : ℝ → E
+| t => x_c' F x₀ k (Set.projIcc 0 1 (by norm_num) t)
 open ENNReal
-lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith (M F) (x_c' F x₀ k) := by
+lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith (M F) (x_c' F x₀ k) := by --(Set.Icc 0 1)
   intro k
   rw [lipschitzWith_iff_dist_le_mul]
   intro z1 z2
@@ -52,15 +54,16 @@ lemma x_is_lipschitz : ∀ (k : ℕ), LipschitzWith (M F) (x_c' F x₀ k) := by
 
 #check x_is_lipschitz F x₀
 --set_option pp.all true
-noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
+noncomputable def x_c (k : ℕ) : (Set.Icc 0 1 : Set ℝ) →ᵇ E where
+  --(Set.Icc 0 (1 : ℝ))
   toFun := x_c' F x₀ k
   map_bounded' := by
     obtain ⟨C, hc⟩ := uniformlyBounded F x₀
     simp
     use 2*C
-    intro a ha b hb
+    intro a ah b bh
     simp
-    rw [x_c',x_c']
+    rw [x_c', x_c']
     norm_num
     rw [dist_eq_norm]
     calc
@@ -86,7 +89,7 @@ noncomputable def x_c (k : ℕ) : (Set.Icc 0 (1 : ℝ)) →ᵇ E where
 #check x
 
 
-lemma x_c_eq_cont_at  (a : Set.Icc 0 1) : EquicontinuousAt (fun n ↦ (x_c F x₀ n).toFun) a := by sorry
+lemma x_c_eq_cont_at  (a : (Set.Icc 0 1 : Set ℝ)) : EquicontinuousAt (fun n ↦ (x_c F x₀ n).toFun) a := by sorry
 -- use Claim1 here
 
 lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ n).toFun) := x_c_eq_cont_at F x₀
@@ -119,4 +122,4 @@ def x_subseq_spec := (x_subseq_exists F x₀).choose_spec
 open Filter
 #check nhds
 #check Tendsto (fun z => (y F x₀ (x_subseq F x₀ z ))) atTop
-lemma y_converges : Tendsto (fun z => (y_c F x₀ (x_subseq F x₀ z ))) atTop (nhds (x_L F x₀).toFun) := by sorry
+-- lemma y_converges : Tendsto (fun z => (y_c F x₀ (x_subseq F x₀ z ))) atTop (nhds (x_L F x₀).toFun) := by sorry

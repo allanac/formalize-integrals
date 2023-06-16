@@ -154,15 +154,15 @@ noncomputable def realFloor (r : ℝ) := (⌊r⌋₊ : ℝ)
 
 #check (Nat.cast : ℕ → ℝ)
 
-theorem deriv_eq_deriv (f g : ℝ → E) (u : Set ℝ) (hu : IsOpen u) : derivWithin f u = derivWithin g u := by
-  ext t
-  unfold derivWithin
-  unfold fderivWithin
-  sorry
+-- theorem deriv_eq_deriv (f g : ℝ → E) (u : Set ℝ) (hu : IsOpen u) : derivWithin f u = derivWithin g u := by
+--   ext t
+--   unfold derivWithin
+--   unfold fderivWithin
+--   sorry
 
-theorem floorDiffAt : ((Nat.cast : ℕ → ℝ) '' univ)ᶜ ⊆ DifferentiableAt ℝ realFloor := by
-  intro x xh
-  apply sorry
+-- theorem floorDiffAt : ((Nat.cast : ℕ → ℝ) '' univ)ᶜ ⊆ DifferentiableAt ℝ realFloor := by
+--   intro x xh
+--   apply sorry
 
 #check pure
 
@@ -171,17 +171,17 @@ theorem floorDiffAt : ((Nat.cast : ℕ → ℝ) '' univ)ᶜ ⊆ DifferentiableAt
 noncomputable def N (ε : ℝ) (t : ℝ) :=
   ⌊t / ε⌋₊
 
-example : deriv (fun u => ((N ε u) : ℝ)) = sorry := by
-  unfold N
-  -- rw [deriv_]
-  sorry
+-- example : deriv (fun u => ((N ε u) : ℝ)) = sorry := by
+--   unfold N
+--   -- rw [deriv_]
+--   sorry
 
 noncomputable def lam (ε : ℝ) (t : ℝ) :=
   (t / ε - N ε t)
 
-example : deriv (lam ε) = sorry := by
-  unfold lam
-  sorry
+-- example : deriv (lam ε) = sorry := by
+--   unfold lam
+--   sorry
 
 noncomputable def y (ε : ℝ) (t : ℝ) :=
   x_N F x₀ ε (N ε t)
@@ -525,9 +525,9 @@ theorem bad_set_almost_nowhere : volume (bad_set ε) = 0 := by
 
 #check derivWithin (x F x₀ ε) NNR_Set
 
-example (t : ℝ) : deriv (fun u => x F x₀ ε u) t = sorry := by
-  unfold x
-  sorry
+-- example (t : ℝ) : deriv (fun u => x F x₀ ε u) t = sorry := by
+--   unfold x
+--   sorry
 
 -- lemma deriv_x_eqae_y : (fun t => deriv (x F x₀ ε) t) =ᵐ[μ₀] (fun t => y F x₀ ε t) := by
 --   calc
@@ -558,9 +558,9 @@ lemma int_deriv_x_eq_int_F_y : ∀ t₀ t₁, 0 ≤ t₀ → t₀ ≤ t₁ → (
 
 open intervalIntegral
 
-example : ∀ (a b c : ℝ) (f : ℝ → ℝ), (∫ (t : ℝ) in (a)..(b), f t) + (∫ (t : ℝ) in (b)..(c), f t) = (∫ (t : ℝ) in (a)..(c), f t) := by
-  intros
-  sorry
+-- example : ∀ (a b c : ℝ) (f : ℝ → ℝ), (∫ (t : ℝ) in (a)..(b), f t) + (∫ (t : ℝ) in (b)..(c), f t) = (∫ (t : ℝ) in (a)..(c), f t) := by
+--   intros
+--   sorry
   -- apply integral_add_adjacent_intervals
   -- library_search
 
@@ -646,16 +646,16 @@ example : ∀ (a b c : ℝ) (f : ℝ → ℝ), (∫ (t : ℝ) in (a)..(b), f t) 
   
 --   sorry
 
-lemma piecewise_constant_ode : ∀ N : ℕ, y F x₀ ε (N*ε) = x₀ + ∫ (s : ℝ) in (0)..(N*ε), F (y F x₀ ε s) ∂volume := by
-  intro N
-  induction' N with k Ik
-  · simp [y, N, x_N]
-  · simp [y, N]
-    calc
-    _ = x_N F x₀ ε k + ε • F (x_N F x₀ ε k) := by sorry
-    _ = y F x₀ ε (k*ε) + ε • F (y F x₀ ε (k*ε)) := by sorry
-    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + ε • F (y F x₀ ε (k*ε)) := by sorry
-    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), (1 : ℝ) ∂volume) • F (y F x₀ ε (k*ε)) := by sorry
-    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), F (y F x₀ ε (k*ε)) ∂volume) := by sorry
-    _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), F (y F x₀ ε s) ∂volume) := by sorry
-    _ = x₀ + (∫ (s : ℝ) in (0)..((k+1)*ε), F (y F x₀ ε s) ∂volume) := by sorry
+-- lemma piecewise_constant_ode : ∀ N : ℕ, y F x₀ ε (N*ε) = x₀ + ∫ (s : ℝ) in (0)..(N*ε), F (y F x₀ ε s) ∂volume := by
+--   intro N
+--   induction' N with k Ik
+--   · simp [y, N, x_N]
+--   · simp [y, N]
+--     calc
+--     _ = x_N F x₀ ε k + ε • F (x_N F x₀ ε k) := by sorry
+--     _ = y F x₀ ε (k*ε) + ε • F (y F x₀ ε (k*ε)) := by sorry
+--     _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + ε • F (y F x₀ ε (k*ε)) := by sorry
+--     _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), (1 : ℝ) ∂volume) • F (y F x₀ ε (k*ε)) := by sorry
+--     _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), F (y F x₀ ε (k*ε)) ∂volume) := by sorry
+--     _ = x₀ + (∫ (s : ℝ) in (0)..(k*ε), F (y F x₀ ε s) ∂volume) + (∫ (s : ℝ) in (k*ε)..((k+1)*ε), F (y F x₀ ε s) ∂volume) := by sorry
+--     _ = x₀ + (∫ (s : ℝ) in (0)..((k+1)*ε), F (y F x₀ ε s) ∂volume) := by sorry

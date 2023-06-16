@@ -42,7 +42,6 @@ theorem uniformlyBounded : ∃ M, ∀ ε > (0 : ℝ), ∀ t ∈ Icc 0 1, ‖x F 
       all_goals
         first
         | linarith
-        | done
       -- exact F_bdd
     _ ≤ _ := by
       simp
