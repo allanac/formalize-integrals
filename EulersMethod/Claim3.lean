@@ -8,7 +8,7 @@ import Mathlib.Topology.UniformSpace.Compact
 open scoped BoundedContinuousFunction
 open Filter
 
-variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] [FiniteDimensional ℝ E]
 variable (F : E →ᵇ E)
 variable (M:ℝ)
 variable (x₀ : E)
