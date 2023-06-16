@@ -13,7 +13,7 @@ variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E
 theorem peano_existance_F_bdd (G : E →ᵇ E) (x₀ : E) :
   (∃ x : ℝ → E,  (∃ x' : ℝ → E,
     Continuous x' ∧ ∀ t ∈ Set.Icc (0:ℝ) 1, HasDerivAt x (x' t) t ∧ x' t = G (x t) ∧ x 0 = x₀)) := by
-      let x_L_ex := Function.extend Subtype.val (x_L G x₀).toFun 0
+      let x_L_ex := x_L' G x₀
       use x_L_ex
       let x_L_ex' := (fun z => G (x_L_ex z))
       use x_L_ex'
@@ -32,6 +32,4 @@ theorem peano_existance_F_bdd (G : E →ᵇ E) (x₀ : E) :
             rw [this]
             sorry
           · rw [intervalIntegral.integral_same] at ftc_0
-            rw [add_zero] at ftc_0
-            sorry
-        
+            rwa [add_zero] at ftc_0
