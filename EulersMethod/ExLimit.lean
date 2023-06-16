@@ -131,10 +131,13 @@ lemma A_is_compact : IsCompact (A F x₀) := by
    simp only [ContinuousMap.toFun_eq_coe, x_c]
    dsimp
    apply hm
+   norm_num
+   exact Nat.cast_add_one_pos k
+   exact Subtype.mem z
+
   .
    apply isCompact_closedBall
-   . apply (x_c_eq_cont F x₀)
-  -- library_search 
+   
 -- need Arzela-Ascoli here
 
 
