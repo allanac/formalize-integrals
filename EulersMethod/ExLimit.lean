@@ -106,11 +106,30 @@ lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ n)) :=
 
 def A := closure (Set.range (x_c F x₀))
 
+open Set
 
-#check A
+lemma BoundedContinuousFunction.arzela_ascoli' [TopologicalSpace α]
+  [CompactSpace α] [PseudoMetricSpace β] [T2Space β] (s : Set β) (hs : IsCompact s)
+  (F : ι → (α →ᵇ β)) (in_s : ∀ i x, F i x ∈ s) (H : Equicontinuous fun i ↦ F i) :
+    IsCompact (closure (range F)) := by
+  apply BoundedContinuousFunction.arzela_ascoli _ hs
+  · rw [forall_comm]
+    intro i 
+    rw [forall_range_iff] 
+    tauto
+  · intro x U U_in 
+    apply (H x U U_in).mono
+    simp
 
-lemma A_is_compact : IsCompact (A F x₀) := by sorry
--- need Arzela-Ascoli here
+#check BoundedContinuousFunction.arzela_ascoli
+
+variable  [FiniteDimensional ℝ E]
+
+lemma A_is_compact : IsCompact (A F x₀) := by 
+  have : IsCompact (Metric.closedBall (0 : E) 1) := isCompact_closedBall _ _
+  apply BoundedContinuousFunction.arzela_ascoli' _ this
+  · sorry 
+  exact x_c_eq_cont F x₀
 
 lemma A_is_seq_compact : IsSeqCompact (A F x₀) := IsCompact.isSeqCompact (A_is_compact F x₀)
 
