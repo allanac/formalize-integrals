@@ -4,11 +4,19 @@ import Mathlib.Data.Set.Intervals.Basic
 import Mathlib.Topology.Order.Basic
 -- import Mathlib.Data.Real.Basic
 import Mathlib.Tactic.Linarith.Frontend
+import Mathlib.Topology.MetricSpace.Lipschitz
+-- import Mathlib.Topology.MetricSpace.EMetricSpace
+-- import Mathlib.Topology.MetricSpace.IsometricSMul
+import Mathlib.Analysis.Normed.Group.Basic
+
+-- below theorem is all we needed...
+#check LipschitzOnWith.extend_real
 
 --[Rle : LE R] [Rlt : LT R]
 variable {R : Type _} [LinearOrder R] [TopologicalSpace R] [OrderTopology R] [DenselyOrdered R] [NoMinOrder R] [NoMaxOrder R]
 variable {S : Type _} [TopologicalSpace S]
 variable {f : R → S}
+variable [PseudoMetricSpace R] [PseudoMetricSpace S]
 
 -- #check ℝ
 
@@ -81,3 +89,32 @@ theorem clamp_cts {f : R → S} {a b : R} (aleb : a ≤ b) (cts : ContinuousOn f
       simp at th
       have th := th.right
       rw [th]
+
+theorem swap_dist' {a b : R} : dist a b = dist b a := by
+  have : dist a b = (Function.swap dist) b a := by rfl
+  rw [this]
+  rw [swap_dist]
+
+theorem clamp_lipschitz {f : ℝ → S} {a b : ℝ} {M : NNReal}
+  (lcts : LipschitzOnWith M f (Set.Icc a b))
+  : LipschitzWith M (clamp f a b) := by
+  apply LipschitzWith.of_dist_le_mul
+  intro t₀ t₁
+  -- rw [edist_dist, edist_dist]
+  wlog h : t₀ ≤ t₁ with h'
+  . rw [swap_dist' (R := ℝ), swap_dist' (R := S)]
+    apply h' (R := ℝ)
+    . exact lcts
+    . push_neg at h
+      linarith
+    . exact f
+  . rw [dist_eq_norm']
+    have : 0 ≤ t₁ - t₀ := by linarith
+    simp only [Real.norm_eq_abs, ge_iff_le, abs_of_nonneg this]
+
+    sorry
+    -- rw [edist_abs]
+    -- have this₀ : dist (clamp f a b t₀) (clamp f a b t₁) = dist (clamp f a b t₁) (clamp f a b t₀) := by
+    --   simp [swap_dist]
+    --   sorry
+#check dist_sub_right
