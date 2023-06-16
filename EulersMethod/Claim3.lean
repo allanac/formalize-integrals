@@ -3,6 +3,7 @@ import EulersMethod.Claim1
 import EulersMethod.Claim2
 import EulersMethod.ExLimit
 import Mathlib.Topology.MetricSpace.Basic
+import Mathlib.Topology.UniformSpace.Compact
 
 open scoped BoundedContinuousFunction
 
@@ -25,7 +26,8 @@ simp at t
 exact ⟨ geqzero,leqone ⟩ 
 
 
-lemma F_uniform_continuous (F' : Continuous F)(B : Metric.closedBall x₀ M ): UniformContinuous F:= by 
+lemma F_uniform_continuous (F' : Continuous F): UniformContinuous F:= by 
+apply CompactSpace.uniformContinuous_of_continuous F'
 -- Heine_Cantor Theorem
 sorry
 
