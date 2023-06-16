@@ -3,6 +3,8 @@ import Mathlib.Topology.MetricSpace.Equicontinuity
 import EulersMethod.Defs
 import EulersMethod.Claim1
 import EulersMethod.Claim2
+import Mathlib.Topology.Basic
+import Mathlib.Topology.UniformSpace.UniformConvergence
 --import Std.Tactic.Infer
 
 -- The xk(·) are uniformly bounded on [0,1]:
@@ -125,11 +127,32 @@ lemma BoundedContinuousFunction.arzela_ascoli' [TopologicalSpace α]
 
 variable  [FiniteDimensional ℝ E]
 
-lemma A_is_compact : IsCompact (A F x₀) := by 
-  have : IsCompact (Metric.closedBall (0 : E) 1) := isCompact_closedBall _ _
-  apply BoundedContinuousFunction.arzela_ascoli' _ this
-  · sorry 
-  exact x_c_eq_cont F x₀
+lemma A_is_compact : IsCompact (A F x₀) := by
+  obtain ⟨M, hm⟩ := uniformlyBounded F x₀   
+  let s := Metric.closedBall (0 : E) M
+  apply BoundedContinuousFunction.arzela_ascoli' s 
+  swap
+  .
+   intro f z
+   simp
+   --obtain ⟨k,hk⟩  := fh
+   --rw[← hk]
+   simp
+   rw [← BoundedContinuousFunction.coe_to_continuous_fun]
+   rw[x_c]
+   unfold x_c'
+   simp only [ContinuousMap.toFun_eq_coe, x_c]
+   dsimp
+   apply hm
+   norm_num
+   exact Nat.cast_add_one_pos _
+   exact Subtype.mem z
+
+  .
+   apply isCompact_closedBall
+  ·
+   apply x_c_eq_cont F x₀
+
 
 lemma A_is_seq_compact : IsSeqCompact (A F x₀) := IsCompact.isSeqCompact (A_is_compact F x₀)
 
