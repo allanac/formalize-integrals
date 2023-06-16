@@ -10,8 +10,8 @@ variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E
 variable (F : E →ᵇ E)
 variable (x₀ : E)
 
-variable {M : NNReal}
-variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
+-- variable {M : NNReal}
+-- variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 
 section
 
@@ -99,14 +99,53 @@ lemma x_eq_integ_seq : ∀ (k : ℕ) (t : ℝ), t ∈ Set.Icc 0 1 → x_c₀ F x
 
 #check Filter.map
 
+-- This looks weird - investigate later
+-- example : ∀ t : ℝ, t ∈ Set.Icc 0 1 →
+--     x_L' F x₀ t
+--       = x₀ + (∫ (s : ℝ) in (0)..(t), F (x_L' F x₀ s)) :=
+--   by
+--   intro t th
+--   rw [← eq_of_tendsto_nhds (x_c₀_tendsto F x₀ t)]
+--   sorry
+--   sorry
+
+lemma eq_of_simul_tendsto {f g : ℕ → E} {a b : E}
+  (fg_eq : f = g)
+  (flim : Filter.Tendsto f (Filter.atTop) (nhds a))
+  (glim : Filter.Tendsto g (Filter.atTop) (nhds b)) :
+    a = b := by
+  apply eq_of_nhds_neBot
+  unfold Filter.Tendsto at flim glim
+  rw [fg_eq] at flim
+  rw [Filter.neBot_iff]
+  apply ne_bot_of_le_ne_bot (b := Filter.map g Filter.atTop)
+  . rw [← Filter.neBot_iff]
+    apply Filter.map_neBot
+  . apply le_inf <;> assumption
+
+#check intervalIntegral.tendsto_integral_filter_of_dominated_convergence
+#check F
+#print BoundedContinuousFunction
+
 theorem xL_eq_integ : ∀ t : ℝ, t ∈ Set.Icc 0 1 →
     x_L' F x₀ t
       = x₀ + (∫ (s : ℝ) in (0)..(t), F (x_L' F x₀ s)) :=
   by
   intro t th
-  calc
-    x_L' F x₀ t = lim (Filter.map (fun k => x_c₀ F x₀ k t) Filter.atTop) := by
-      symm
-      apply lim_eq
-      sorry
-    _ = _ := by sorry
+  have : (fun k => x_c₀ F x₀ k t) = (fun k => x₀ + ∫ (s : ℝ) in (0)..(t), F (y_c₀ F x₀ k s)) := by
+    ext
+    apply x_eq_integ_seq; exact th
+  apply eq_of_simul_tendsto (fg_eq := this)
+  . apply x_c₀_tendsto
+  . apply Filter.Tendsto.const_add
+    apply intervalIntegral.tendsto_integral_filter_of_dominated_convergence ( bound := fun _ => M F)
+    . apply Filter.eventually_of_forall
+      intro k
+      apply MeasureTheory.StronglyMeasurable.aestronglyMeasurable
+      -- apply MeasureTheory.StronglyMeasurable.comp_measurable
+      apply Continuous.comp_stronglyMeasurable
+      . apply BoundedContinuousFunction.continuous
+      . sorry
+    . sorry
+    . sorry
+    . sorry
