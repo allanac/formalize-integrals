@@ -3,6 +3,8 @@ import Mathlib.Topology.MetricSpace.Equicontinuity
 import EulersMethod.Defs
 import EulersMethod.Claim1
 import EulersMethod.Claim2
+import Mathlib.Topology.Basic
+import Mathlib.Topology.UniformSpace.UniformConvergence
 --import Std.Tactic.Infer
 
 -- The xk(·) are uniformly bounded on [0,1]:
@@ -17,7 +19,7 @@ open MeasureTheory
 
 section
 
-variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] [ProperSpace E]
 variable (F : E →ᵇ E)
 variable (x₀ : E)
 #where
@@ -105,12 +107,36 @@ lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ n)) :=
   equicontinuous_of_lipschitzWith (x_c_lip F x₀)
 
 def A := closure (Set.range (x_c F x₀))
-
-
+-- _ _ _ (x_c_eq_cont F x₀)
 #check A
 
-lemma A_is_compact : IsCompact (A F x₀) := by sorry
+lemma x_c_eq_cont' : Equicontinuous ((↑) : (A F x₀) → (ℝ)  → E) :=
+  equicontinuous_of_lipschitzWith (x_c_lip F x₀)
+
+
+lemma A_is_compact : IsCompact (A F x₀) := by
+  obtain ⟨M, hm⟩ := uniformlyBounded F x₀   
+  let s := Metric.closedBall (0 : E) M
+  apply BoundedContinuousFunction.arzela_ascoli s 
+  swap
+  .
+   intro f z fh
+   simp
+   obtain ⟨k,hk⟩  := fh
+   rw[← hk]
+   simp
+   rw [← BoundedContinuousFunction.coe_to_continuous_fun]
+   rw[x_c]
+   unfold x_c'
+   simp only [ContinuousMap.toFun_eq_coe, x_c]
+   dsimp
+   apply hm
+  .
+   apply isCompact_closedBall
+   . apply (x_c_eq_cont F x₀)
+  -- library_search 
 -- need Arzela-Ascoli here
+
 
 lemma A_is_seq_compact : IsSeqCompact (A F x₀) := IsCompact.isSeqCompact (A_is_compact F x₀)
 
