@@ -25,7 +25,7 @@ variable (x₀ : E)
 -- variable (M : NNReal)
 -- variable (F_bdd : ∀ e : E, ‖F e‖ ≤ M)
 
-noncomputable def y_c (k : ℕ) : ℝ → E
+noncomputable def y_c (k : ℕ) : (Set.Icc 0 1 : Set ℝ) → E
 | t => y F x₀ (1/((k : ℝ)+1)) t
 
 noncomputable def x_c' (k : ℕ) : (Set.Icc 0 1 : Set ℝ) → E
