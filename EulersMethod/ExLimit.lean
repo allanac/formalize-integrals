@@ -104,7 +104,7 @@ lemma x_c_lip : ∀ (k : ℕ), LipschitzWith (M F) (x_c F x₀ k) := x_is_lipsch
 lemma x_c_eq_cont : Equicontinuous (fun n ↦ (x_c F x₀ n)) :=
   equicontinuous_of_lipschitzWith (x_c_lip F x₀)
 
-def A := Set.range (x_c F x₀)
+def A := closure (Set.range (x_c F x₀))
 
 
 #check A
@@ -114,7 +114,7 @@ lemma A_is_compact : IsCompact (A F x₀) := by sorry
 
 lemma A_is_seq_compact : IsSeqCompact (A F x₀) := IsCompact.isSeqCompact (A_is_compact F x₀)
 
-def x_exists := ((A_is_seq_compact (x := x_c F x₀) F x₀) (by simp; intro n; rw [A]; aesop))
+def x_exists := ((A_is_seq_compact (x := x_c F x₀) F x₀) (by intro n; rw [A]; apply subset_closure; aesop))
 noncomputable def x_L := (x_exists F x₀).choose
 def x_L_spec :  (x_L F x₀) ∈ A F x₀ ∧ ∃ φ : ℕ → ℕ , StrictMono φ ∧ Tendsto (x_c F x₀ ∘ φ) atTop (𝓝 (x_L F x₀))
   := (x_exists F x₀).choose_spec

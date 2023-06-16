@@ -6,6 +6,7 @@ import Mathlib.Topology.MetricSpace.Basic
 import Mathlib.Topology.UniformSpace.Compact
 
 open scoped BoundedContinuousFunction
+open Filter
 
 variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
 variable (F : E →ᵇ E)
@@ -26,16 +27,23 @@ simp at t
 exact ⟨ geqzero,leqone ⟩ 
 
 
-lemma F_uniform_continuous (F' : Continuous F): UniformContinuous F:= by 
-apply CompactSpace.uniformContinuous_of_continuous F'
+--lemma F_uniform_continuous (F' : Continuous F): UniformContinuous F:= by 
+--apply CompactSpace.uniformContinuous_of_continuous F'
 -- Heine_Cantor Theorem
-sorry
+--sorry
 
 #check x_subseq F x₀
 #check F
 #check y_c
+#check (fun z =>(fun t : ℝ => F (y_c F x₀ (x_subseq F x₀ z) (Set.projIcc 0 1 (by norm_num) t))))
+#check y_converges
+#check ((x_L F x₀).toFun)
 
-theorem F_converges (F' : Continuous F) : ∀ (t : ((Set.Icc 0 1) : Set ℝ)),
-  Filter.Tendsto (fun z => F (y_c F x₀ (x_subseq F x₀ z) t)) atTop (nhds (F (x_L F x₀ t))):= by  
-
-sorry  
+theorem F_converges (F' : Continuous F) : ∀ t : ℝ,
+  Tendsto (fun z =>(F (y_c F x₀ (x_subseq F x₀ z) (Set.projIcc 0 1 (by norm_num) t)))) 
+    atTop (nhds (F (x_L F x₀ (Set.projIcc 0 1 (by norm_num) t)))) := by  
+      
+      intro t
+      have y_conv := (y_converges F x₀).tendsto_at (Set.projIcc 0 1 (by norm_num) t)
+      have F_conv := (Continuous.tendsto F' ((x_L F x₀).toFun (Set.projIcc 0 1 (by norm_num) t)))
+      apply Tendsto.comp F_conv y_conv
