@@ -6,7 +6,7 @@ import Mathlib.Topology.UniformSpace.UniformConvergence
 
 open scoped BoundedContinuousFunction
 
-variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E]
+variable {E: Type _} [NormedAddCommGroup E] [NormedSpace ℝ E] [CompleteSpace E] [FiniteDimensional ℝ E]
 variable (F : E →ᵇ E)
 variable (x₀ : E)
 
