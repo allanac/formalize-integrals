@@ -21,7 +21,7 @@ section
 
 noncomputable def x_L' := fun (t : ℝ) => x_L F x₀ (Set.projIcc 0 1 (by norm_num) t)
 
-
+-- lemma F_y_c_integrable : MeasureTheory.Integrable
 
 -- noncomputable def x_L'' (k : ℕ) : ℝ →ᵇ E where
 --   toFun := x_L'f F x₀ k
@@ -37,6 +37,12 @@ lemma x_c₀_tendsto (t : ℝ) : Filter.Tendsto (fun k : ℕ => x_c₀ F x₀ k 
   sorry
 lemma y_c₀_tendsto (t : ℝ) : Filter.Tendsto (fun k : ℕ => y_c₀ F x₀ k t) atTop (nhds (x_L' F x₀ t)) := by
   sorry
+
+-- #check MeasureTheory.SimpleFunc
+-- lemma y_c₀_simple (k : ℕ) : MeasureTheory.SimpleFunc := by sorry
+-- the original lemma actually proves integrability, so we will extract measurablility
+#check Fy_measurable
+-- lemma Fy_just_measurable (k : ℕ) : 0 < ε → t₁ ≤ t₀ → 0 ≤ t₁ → IntervalIntegrable (fun s => ↑F (y F x₀ ε s)) MeasureTheory.volume t₁ t₀
 
 variable (G : Filter (ℝ →ᵇ E))
 #check lim G
@@ -141,11 +147,34 @@ theorem xL_eq_integ : ∀ t : ℝ, t ∈ Set.Icc 0 1 →
     apply intervalIntegral.tendsto_integral_filter_of_dominated_convergence ( bound := fun _ => M F)
     . apply Filter.eventually_of_forall
       intro k
-      apply MeasureTheory.StronglyMeasurable.aestronglyMeasurable
-      -- apply MeasureTheory.StronglyMeasurable.comp_measurable
-      apply Continuous.comp_stronglyMeasurable
-      . apply BoundedContinuousFunction.continuous
+      apply MeasureTheory.Integrable.aestronglyMeasurable
+      apply MeasureTheory.IntegrableOn.integrable
+      apply MeasureTheory.IntegrableOn.congr_fun (f := fun s => F (y F x₀ _ s))
+      apply MeasureTheory.IntegrableOn.mono_set (t := Ι 0 1)
+      apply IntervalIntegrable.def
+      apply Fy_measurable (ε := (1 / (↑(x_subseq F x₀ k) + 1)))
       . sorry
-    . sorry
-    . sorry
-    . sorry
+      . norm_num
+      . norm_num
+      . rintro s ⟨l, r⟩
+        constructor
+        simp [l, r, th.1, th.2] at l r |-
+        exact l
+        simp [l, r, th.1, th.2] at l r |-
+        linarith [th.2]
+      -- . sorry
+      . rintro s ⟨slb, sub⟩
+        simp [th.1, th.2] at slb sub
+        unfold y_c₀ y_c
+        dsimp
+        rw [Set.projIcc_val (by norm_num : 0 ≤ (1 : ℝ)) ⟨s, by constructor <;> linarith [th.1, th.2]⟩]
+      . apply measurableSet_uIoc
+    . apply Filter.eventually_of_forall
+      intro _
+      apply Filter.eventually_of_forall
+      intro _ _
+      apply F_bdd
+    . apply intervalIntegrable_const
+    . apply Filter.eventually_of_forall
+      intro s sh
+      sorry
