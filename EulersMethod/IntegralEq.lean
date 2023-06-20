@@ -33,10 +33,12 @@ noncomputable def x_L' := fun (t : ℝ) => x_L F x₀ (Set.projIcc 0 1 (by norm_
 noncomputable def x_c₀ (k : ℕ) := fun (t : ℝ) => x_c F x₀ (x_subseq F x₀ k) (Set.projIcc 0 1 (by norm_num) t)
 noncomputable def y_c₀ (k : ℕ) := fun (t : ℝ) => y_c F x₀ (x_subseq F x₀ k) (Set.projIcc 0 1 (by norm_num) t)
 
-lemma x_c₀_tendsto (t : ℝ) : Filter.Tendsto (fun k : ℕ => x_c₀ F x₀ k t) atTop (nhds (x_L' F x₀ t)) := by
-  sorry
-lemma y_c₀_tendsto (t : ℝ) : Filter.Tendsto (fun k : ℕ => y_c₀ F x₀ k t) atTop (nhds (x_L' F x₀ t)) := by
-  sorry
+lemma x_c₀_tendsto (t : ℝ) : Filter.Tendsto (fun k : ℕ => x_c₀ F x₀ k t) Filter.atTop (nhds (x_L' F x₀ t)) :=
+  TendstoUniformly.tendsto_at (x_converges F x₀) _
+lemma y_c₀_tendsto (t : ℝ) : Filter.Tendsto (fun k : ℕ => y_c₀ F x₀ k t) Filter.atTop (nhds (x_L' F x₀ t)) := -- by
+  TendstoUniformly.tendsto_at (y_converges F x₀) _
+  -- exact this _
+  -- sorry
 
 -- #check MeasureTheory.SimpleFunc
 -- lemma y_c₀_simple (k : ℕ) : MeasureTheory.SimpleFunc := by sorry
@@ -153,7 +155,9 @@ theorem xL_eq_integ : ∀ t : ℝ, t ∈ Set.Icc 0 1 →
       apply MeasureTheory.IntegrableOn.mono_set (t := Ι 0 1)
       apply IntervalIntegrable.def
       apply Fy_measurable (ε := (1 / (↑(x_subseq F x₀ k) + 1)))
-      . sorry
+      . norm_num
+        norm_cast
+        simp
       . norm_num
       . norm_num
       . rintro s ⟨l, r⟩
@@ -176,5 +180,11 @@ theorem xL_eq_integ : ∀ t : ℝ, t ∈ Set.Icc 0 1 →
       apply F_bdd
     . apply intervalIntegrable_const
     . apply Filter.eventually_of_forall
-      intro s sh
-      sorry
+      intro s _
+      -- have : y_c₀.proof_1 = x_L'.proof_1 := rfl
+      -- rw [this]
+      -- have ivalproj := Set.projIcc 0 (1 : ℝ) (by norm_num)
+      -- have := TendstoUniformly.tendsto_at (y_converges F x₀) -- (ivalproj s)
+      apply Filter.Tendsto.comp (hf := y_c₀_tendsto _ _ _)
+      apply Continuous.tendsto
+      exact F.continuous
